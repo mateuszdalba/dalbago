@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">Logout</h2>
+<p class="mb-4">Are you sure you want to log out?</p>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Yes, Logout</button>
+  <a href="/dashboard/" class="ml-4 text-blue-600 hover:underline">Cancel</a>
+</form>
+{% endblock %}

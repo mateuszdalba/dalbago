@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center">
+  <h1 class="text-4xl font-bold mb-4 text-blue-600">Welcome to DalbaGo</h1>
+  <p class="text-lg text-gray-600 mb-10">Your self-service, automated garage platform.</p>
+
+  <div class="grid md:grid-cols-3 gap-6">
+    <a href="{% url 'vision:upload_plate' %}" 
+       class="bg-white border border-gray-200 shadow-md rounded-xl p-6 hover:shadow-xl transition">
+      <h2 class="text-xl font-semibold mb-2">🔍 Test Plate Recognition</h2>
+      <p class="text-gray-600">Upload an image and check automatic license plate detection.</p>
+    </a>
+
+    <a href="/tools/toolbox/1/update/" 
+       class="bg-white border border-gray-200 shadow-md rounded-xl p-6 hover:shadow-xl transition">
+      <h2 class="text-xl font-semibold mb-2">🧰 Toolbox Check</h2>
+      <p class="text-gray-600">Monitor toolbox weight and detect missing tools.</p>
+    </a>
+
+    <a href="/admin/" 
+       class="bg-white border border-gray-200 shadow-md rounded-xl p-6 hover:shadow-xl transition">
+      <h2 class="text-xl font-semibold mb-2">⚙️ Admin Panel</h2>
+      <p class="text-gray-600">Manage garages, users, bookings and system logs.</p>
+    </a>
+  </div>
+</div>
+{% endblock %}

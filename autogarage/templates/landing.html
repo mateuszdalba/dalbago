@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center py-20">
+  <h1 class="text-5xl font-bold text-blue-600 mb-6">Welcome to DalbaGo</h1>
+  <p class="text-lg text-gray-600 mb-10">Automated, self-service garages. Anytime. Anywhere.</p>
+
+  <div class="flex justify-center space-x-6">
+    <a href="{% url 'users:login' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+      🔑 Login
+    </a>
+    <a href="{% url 'users:register' %}" class="bg-lime-500 text-black px-6 py-3 rounded-lg hover:bg-lime-600">
+      ✍️ Register
+    </a>
+  </div>
+</div>
+{% endblock %}

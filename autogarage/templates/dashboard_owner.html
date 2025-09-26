@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Owner Dashboard</h1>
+
+<div class="grid md:grid-cols-2 gap-6">
+  <div class="bg-white shadow rounded-lg p-6">
+    <h2 class="text-xl font-semibold">Garage Cameras</h2>
+    <p class="text-gray-600">Live stream (24/7)</p>
+    <!-- Placeholder for camera iframe -->
+    <iframe src="http://CAMERA_STREAM_URL" class="w-full h-64 bg-black"></iframe>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-6">
+  <h2 class="text-xl font-semibold">Toolbox Settings</h2>
+  <p class="text-gray-600 mb-2">Reference weight: {{ toolbox.weight_ref }} g</p>
+
+  <form method="post" action="{% url 'tools:update_reference' toolbox.id %}" class="space-y-4">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Update
+    </button>
+  </form>
+</div>
+
+<div class="mt-8 bg-white shadow rounded-lg p-6">
+  <h2 class="text-xl font-semibold">Access Logs</h2>
+  <table class="w-full mt-4 border">
+    <thead><tr><th>Plate</th><th>User</th><th>Garage</th><th>Time</th></tr></thead>
+    <tbody>
+      {% for log in logs %}
+        <tr class="border-t">
+          <td>{{ log.plate_detected }}</td>
+          <td>{{ log.booking.user.username }}</td>
+          <td>{{ log.booking.garage.name }}</td>
+          <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
