@@ -5,40 +5,77 @@
 <h1 class="text-2xl font-bold mb-4">Owner Dashboard</h1>
 
 <div class="grid md:grid-cols-2 gap-6">
+  <!-- Cameras card -->
   <div class="bg-white shadow rounded-lg p-6">
-    <h2 class="text-xl font-semibold">Garage Cameras</h2>
-    <p class="text-gray-600">Live stream (24/7)</p>
-    <!-- Placeholder for camera iframe -->
-    <iframe src="http://CAMERA_STREAM_URL" class="w-full h-64 bg-black"></iframe>
+    <div class="flex justify-between items-center">
+      <div>
+        <h2 class="text-xl font-semibold">Garage Cameras</h2>
+        <p class="text-gray-600">Live stream (24/7)</p>
+      </div>
+      <a href="{% url 'garage:camera_add' %}" class="bg-green-600 text-white px-3 py-1 rounded">Add camera</a>
+    </div>
+
+    <div class="mt-4 space-y-4">
+      {% for cam in cameras %}
+        <div class="border rounded p-3 flex">
+          <div class="w-1/2 pr-3">
+            <h3 class="font-semibold">{{ cam.name }}</h3>
+            <p class="text-sm text-gray-600 break-all">{{ cam.stream_url }}</p>
+            <div class="mt-2">
+              <a href="{% url 'garage:camera_edit' cam.id %}" class="text-sm text-blue-600 mr-3">Edit</a>
+              <form method="post" action="{% url 'garage:camera_delete' cam.id %}" class="inline">
+                {% csrf_token %}
+                <button class="text-sm text-red-600">Delete</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="w-1/2">
+            {% if cam.is_mjpeg %}
+              <img src="{{ cam.stream_url }}" class="w-full h-40 object-cover bg-black" alt="{{ cam.name }}">
+            {% elif cam.is_http %}
+              <iframe src="{{ cam.stream_url }}" class="w-full h-40 bg-black"></iframe>
+            {% else %}
+              <div class="w-full h-40 bg-black flex items-center justify-center text-white text-sm">
+                Unsupported stream type. Use MJPEG/HTTP or vendor URL.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-gray-600">No cameras configured yet.</p>
+      {% endfor %}
+    </div>
   </div>
 
-  <div class="bg-white shadow rounded-lg p-6">
-  <h2 class="text-xl font-semibold">Toolbox Settings</h2>
-  <p class="text-gray-600 mb-2">Reference weight: {{ toolbox.weight_ref }} g</p>
-
-  <form method="post" action="{% url 'tools:update_reference' toolbox.id %}" class="space-y-4">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      Update
-    </button>
-  </form>
-</div>
-
-<div class="mt-8 bg-white shadow rounded-lg p-6">
-  <h2 class="text-xl font-semibold">Access Logs</h2>
-  <table class="w-full mt-4 border">
-    <thead><tr><th>Plate</th><th>User</th><th>Garage</th><th>Time</th></tr></thead>
-    <tbody>
-      {% for log in logs %}
-        <tr class="border-t">
-          <td>{{ log.plate_detected }}</td>
-          <td>{{ log.booking.user.username }}</td>
-          <td>{{ log.booking.garage.name }}</td>
-          <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+  <!-- Access logs -->
+  <div class="mt-8 bg-white shadow rounded-lg p-6 md:col-span-2">
+    <h2 class="text-xl font-semibold">Access Logs</h2>
+    <table class="w-full mt-4 border">
+      <thead>
+        <tr class="bg-gray-100 text-left">
+          <th class="px-2 py-1">Plate</th>
+          <th class="px-2 py-1">User</th>
+          <th class="px-2 py-1">Garage</th>
+          <th class="px-2 py-1">Time</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+          <tr class="border-t">
+            <td class="px-2 py-1">{{ log.plate_detected }}</td>
+            <td class="px-2 py-1">{{ log.booking.user.username }}</td>
+            <td class="px-2 py-1">{{ log.booking.garage.name }}</td>
+            <td class="px-2 py-1">{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" class="text-gray-600 px-2 py-2 text-center">No logs yet.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
+
 {% endblock %}

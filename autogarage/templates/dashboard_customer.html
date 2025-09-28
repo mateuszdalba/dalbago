@@ -2,36 +2,42 @@
 {% block content %}
 <h1 class="text-2xl font-bold mb-4">Customer Dashboard</h1>
 
-<div class="grid md:grid-cols-2 gap-6">
   <div class="bg-white shadow rounded-lg p-6">
-    <h2 class="text-xl font-semibold">My License Plates</h2>
-    <ul>
-      {% for plate in request.user.plates.all %}
+    <h3 class="text-xl font-semibold mb-4">My License Plates</h3>
+    <ul class="list-disc pl-6">
+      {% for plate in plates %}
         <li>{{ plate.plate_number }}</li>
       {% empty %}
-        <li class="text-gray-600">No plates added yet</li>
+        <li>No plates yet.</li>
       {% endfor %}
     </ul>
+    <a href="{% url 'users:license_plates' %}" 
+       class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Add Plate
+    </a>
   </div>
 
-  <div class="bg-white shadow rounded-lg p-6">
+  <div class="bg-white shadow rounded-lg p-6 mt-6">
     <h2 class="text-xl font-semibold">My Bookings</h2>
     <ul>
       {% for booking in bookings %}
-        <li>
-          Garage {{ booking.garage.name }}: 
-          {{ booking.start_time|date:"Y-m-d H:i" }} → 
+        <li class="mb-2">
+          Garage <strong>{{ booking.garage.name }}</strong>: 
+          {{ booking.start_time|date:"Y-m-d H:i" }} →
           {% if booking.end_time %}{{ booking.end_time|date:"Y-m-d H:i" }}{% else %}Active{% endif %}
         </li>
       {% empty %}
         <li class="text-gray-600">No bookings yet</li>
       {% endfor %}
     </ul>
+    <a href="{% url 'garage:create_booking' %}" 
+       class="inline-block mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+      Book Garage
+    </a>
   </div>
-</div>
 
-<div class="mt-8 bg-white shadow rounded-lg p-6">
-  <h2 class="text-xl font-semibold">Billing History</h2>
-  <p class="text-gray-600">💳 Billing integration placeholder (Stripe/PayU/etc.)</p>
-</div>
+  <div class="mt-8 bg-white shadow rounded-lg p-6">
+    <h2 class="text-xl font-semibold">Billing History</h2>
+    <p class="text-gray-600">💳 Billing integration placeholder (Stripe/PayU/etc.)</p>
+  </div>
 {% endblock %}

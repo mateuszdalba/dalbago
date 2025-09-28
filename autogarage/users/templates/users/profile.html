@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">My Profile</h1>
+
+<div class="bg-white shadow rounded-lg p-6 mb-6">
+  <h2 class="text-xl font-semibold mb-4">Personal Info</h2>
+  <p><strong>Username:</strong> {{ user.username }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+  <p><strong>Phone:</strong> {{ user.phone_number }}</p>
+  <p><strong>Address:</strong> {{ user.address }}</p>
+  <a href="{% url 'users:edit_profile' %}"
+     class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    Edit Profile
+  </a>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6 mb-6">
+  <h2 class="text-xl font-semibold mb-4">My License Plates</h2>
+  <ul class="list-disc pl-6">
+    {% for plate in plates %}
+      <li class="flex justify-between items-center">
+        {{ plate.plate_number }}
+        <form method="post" action="{% url 'users:delete_plate' plate.id %}">
+          {% csrf_token %}
+          <button type="submit" class="text-red-600 hover:underline">Delete</button>
+        </form>
+      </li>
+    {% empty %}
+      <li>No plates yet.</li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'users:license_plates' %}"
+     class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+    Add Plate
+  </a>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6">
+  <h2 class="text-xl font-semibold mb-4">My Bookings</h2>
+  <ul>
+  {% for booking in bookings %}
+    <li class="mb-2 flex justify-between items-center">
+      <span>
+        Garage <strong>{{ booking.garage.name }}</strong>:
+        {{ booking.start_time|date:"Y-m-d H:i" }} →
+        {{ booking.end_time|date:"Y-m-d H:i" }}
+
+        {% if booking.cancelled %}
+          <span class="text-red-600 ml-2">(Cancelled {{ booking.cancelled_at|date:"Y-m-d H:i" }})</span>
+          {% if booking.cancel_reason %}
+            <span class="text-gray-500 ml-2">Reason: {{ booking.cancel_reason }}</span>
+          {% endif %}
+        {% endif %}
+      </span>
+
+      {% if not booking.cancelled %}
+      <a href="{% url 'garage:cancel_booking' booking.id %}"
+         class="ml-4 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+        Cancel
+      </a>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No bookings yet.</li>
+  {% endfor %}
+</ul>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% load static %}
+<nav class="bg-blue-600 text-white shadow-md">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    
+    <!-- Logo -->
+    <div class="flex items-center space-x-3">
+      <img src="{% static 'images/dalba_logo.png' %}" alt="DalbaGo logo" class="h-10 w-auto">
+      <a href="/" class="text-2xl font-bold">DalbaGo</a>
+    </div>
+
+    <!-- Nav links -->
+    <ul class="flex space-x-6">
+      {% if user.is_authenticated %}
+        <li><a href="{% url 'core:dashboard' %}" class="hover:text-lime-300">Dashboard</a></li>
+        <li><a href="{% url 'users:profile' %}" class="hover:text-gray-200">My Profile</a></li>
+        <li><a href="{% url 'users:license_plates' %}" class="hover:text-gray-200">My Plates</a></li>
+        <li><a href="{% url 'users:logout' %}" class="hover:text-lime-300">Logout</a></li>
+      {% else %}
+        <li><a href="{% url 'users:login' %}" class="hover:text-lime-300">Login</a></li>
+        <li><a href="{% url 'users:register' %}" class="hover:text-lime-300">Register</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

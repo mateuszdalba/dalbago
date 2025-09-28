@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">My License Plates</h2>
+
+<!-- Add Plate Form -->
+<div class="bg-white shadow rounded-lg p-6 mb-6">
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" 
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Add Plate
+    </button>
+  </form>
+</div>
+
+<!-- Saved Plates -->
+<div class="bg-white shadow rounded-lg p-6">
+  <h3 class="text-xl font-semibold mb-4">Saved Plates</h3>
+  <ul class="divide-y divide-gray-200">
+    {% for plate in plates %}
+      <li class="flex justify-between items-center py-2">
+        <span>{{ plate.plate_number }}</span>
+        <form method="post" action="{% url 'users:delete_plate' plate.id %}">
+          {% csrf_token %}
+          <button type="submit" 
+                  class="text-red-600 hover:underline">
+            Delete
+          </button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="py-2 text-gray-600">No plates yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

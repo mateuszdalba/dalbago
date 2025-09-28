@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">Cancel Booking</h2>
+
+<p>
+  Are you sure you want to cancel your booking for 
+  <strong>{{ booking.garage.name }}</strong>
+  ({{ booking.start_time|date:"Y-m-d H:i" }} → {{ booking.end_time|date:"Y-m-d H:i" }})?
+</p>
+
+<form method="post" class="mt-4 space-y-4">
+  {% csrf_token %}
+  <label class="block">
+    Reason (optional):
+    <input type="text" name="reason" class="border rounded px-3 py-2 w-full" />
+  </label>
+  <div>
+    <button type="submit"
+            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+      Yes, Cancel Booking
+    </button>
+    <a href="{% url 'users:profile' %}"
+       class="ml-4 text-gray-600 hover:underline">Back</a>
+  </div>
+</form>
+{% endblock %}

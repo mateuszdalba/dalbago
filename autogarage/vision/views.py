@@ -19,6 +19,7 @@ def plate_check(request):
     try:
         payload = json.loads(request.body.decode("utf-8"))
         plate = payload.get("plate")
+        plate = plate.replace(" ", "").upper()
         garage_id = payload.get("garage_id")
     except Exception:
         return HttpResponseBadRequest("Invalid JSON")
@@ -62,6 +63,8 @@ def upload_plate_image(request):
         if form.is_valid():
             obj = form.save()
             plate = detect_plate_from_image(obj.image.path)
+            if plate:
+                plate = plate.replace(" ", "").upper()
             obj.detected_plate = plate
             obj.save()
             return render(request, "vision/plate_result.html", {"obj": obj, "plate": plate})

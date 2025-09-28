@@ -109,7 +109,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -126,3 +127,7 @@ LOGOUT_REDIRECT_URL = "/"   # back to landing page
 LOGIN_URL = "/users/login/" # if someone not logged in tries to open dashboard
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
+
+# Session will last 2 weeks
+SESSION_COOKIE_AGE = 1209600  # seconds = 2 weeks
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
