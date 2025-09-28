@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white shadow rounded-lg p-6">
+  <h1 class="text-3xl font-bold mb-4">{{ garage.name }}</h1>
+
+   <!-- Image -->
+ {% if garage.image %}
+  <img src="{{ garage.image.url }}" alt="{{ garage.name }}" class="rounded shadow-md w-full h-48 object-cover">
+{% else %}
+  <div class="w-full h-48 bg-gray-300 flex items-center justify-center text-gray-600">
+    No image uploaded.
+  </div>
+{% endif %}
+
+  <!-- Description -->
+  <p class="text-gray-700 mb-4">{{ garage.description }}</p>
+
+  <!-- Location & Price -->
+  <div class="flex justify-between items-center mb-6">
+    <p class="text-gray-600">📍 {{ garage.location }}</p>
+    <p class="text-lg font-semibold">💰 {{ garage.price_per_hour }} PLN / hour</p>
+  </div>
+
+  <!-- Allowed activities -->
+  <h2 class="text-xl font-semibold mt-6">✅ Dozwolone aktywności</h2>
+  <ul class="list-disc pl-6 mb-4">
+    {% for activity in garage.allowed_activities.all %}
+      <li>{{ activity.name }}</li>
+    {% empty %}
+      <li class="text-gray-500">Brak informacji</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Forbidden activities -->
+  <h2 class="text-xl font-semibold mt-6">❌ Zabronione aktywności</h2>
+  <ul class="list-disc pl-6 mb-4 text-red-600">
+    {% for activity in garage.forbidden_activities.all %}
+      <li>{{ activity.name }}</li>
+    {% empty %}
+      <li class="text-gray-500">Brak</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Tools -->
+  <h2 class="text-xl font-semibold mt-6">🛠️ Wyposażenie garażu</h2>
+  <ul class="list-disc pl-6 mb-4">
+    {% for tool in garage.tools.all %}
+      <li>{{ tool.name }}</li>
+    {% empty %}
+      <li class="text-gray-500">Brak</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Booking button -->
+  {% if user.is_authenticated and user.role == "customer" %}
+    <a href="{% url 'garage:book_garage' garage.id %}" 
+       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Book Now
+    </a>
+  {% else %}
+    <p class="text-gray-500 mt-4">Zaloguj się jako użytkownik, aby dokonać rezerwacji.</p>
+  {% endif %}
+</div>
+{% endblock %}

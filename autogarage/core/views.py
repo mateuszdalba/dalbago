@@ -7,13 +7,10 @@ from users.models import LicensePlate
 def landing(request):
     return render(request, "landing.html")
 
+
 @login_required
 def dashboard(request):
-    if request.user.role == "owner":
-        logs = AccessLog.objects.order_by("-timestamp")[:20]
-        toolbox = Toolbox.objects.first()
-        return render(request, "dashboard_owner.html", {"logs": logs, "toolbox": toolbox})
+    if request.user.garages.exists():
+        return redirect("garage:owner_dashboard")
     else:
-        bookings = Booking.objects.filter(user=request.user).order_by("-start_time")[:10]
-        plates = LicensePlate.objects.filter(user=request.user)
-        return render(request, "dashboard_customer.html", {"bookings": bookings, "plates":plates})
+        return render(request, "dashboard_customer.html")

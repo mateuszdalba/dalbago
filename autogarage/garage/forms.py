@@ -2,6 +2,7 @@ from django import forms
 from .models import Booking
 from .models import Camera
 from .models import Garage
+from django.core.exceptions import ValidationError
 
 class BookingForm(forms.ModelForm):
     class Meta:
@@ -23,8 +24,20 @@ class CameraForm(forms.ModelForm):
 class GarageForm(forms.ModelForm):
     class Meta:
         model = Garage
-        fields = ["name", "description", "price_per_hour", "location", "features", "activities", "image"]
+        exclude = ['owner'] 
+        fields = ["name", "description", "price_per_hour", "location", "image",
+                 "allowed_activities", "forbidden_activities", "tools"]
         widgets = {
-            "features": forms.CheckboxSelectMultiple,
-            "activities": forms.CheckboxSelectMultiple,
+            "allowed_activities": forms.CheckboxSelectMultiple,
+            "forbidden_activities": forms.CheckboxSelectMultiple,
+            "tools": forms.CheckboxSelectMultiple,
         }
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image:
+            if not image.content_type in ['image/jpeg', 'image/png']:
+                raise ValidationError("Only JPEG and PNG formats are allowed.")
+            if image.size > 5 * 1024 * 1024:  # Optional: 5MB limit
+                raise ValidationError("Image file too large (max 5MB).")
+        return image

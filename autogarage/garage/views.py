@@ -1,24 +1,29 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .forms import BookingForm, CameraForm
-from django.shortcuts import get_object_or_404, redirect
-from .models import Booking, Garage, Camera
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
-import requests
 from django.http import JsonResponse
+
+from .models import Booking, Garage, Camera, AccessLog
+from .forms import BookingForm, CameraForm, GarageForm
+
+import requests
 
 
 @login_required
 def owner_dashboard(request):
-    # zakładamy że owner ma tylko jednen garage; dopasuj do twojej logiki
-    garages = Garage.objects.filter(owner=request.user)
+    garages = Garage.objects.filter(owner=request.user).all()
     cameras = Camera.objects.filter(owner=request.user)
+    logs = AccessLog.objects.filter(booking__garage__owner=request.user).select_related("booking", "booking__user", "booking__garage")
+    
+    print("Zalogowany:", request.user.username)
+    print("Garaże:", Garage.objects.filter(owner=request.user))
+
     # Toolbox, logs etc. - pobierz jak masz
     return render(request, "dashboard_owner.html", {
         "garages": garages,
         "cameras": cameras,
-        # "toolbox": toolbox, "logs": logs
+        "logs": logs,
     })
 
 @login_required
@@ -103,3 +108,38 @@ def cancel_booking(request, booking_id):
         return redirect("users:profile")
 
     return render(request, "garage/confirm_cancel_booking.html", {"booking": booking})
+
+
+@login_required
+def edit_garage(request, garage_id):
+    garage = get_object_or_404(Garage, id=garage_id, owner=request.user)
+
+    if request.method == "POST":
+        form = GarageForm(request.POST, request.FILES, instance=garage)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Garage updated successfully.")
+            return redirect("garage:owner_dashboard")
+    else:
+        form = GarageForm(instance=garage)
+
+    return render(request, "garage/edit_garage.html", {"form": form, "garage": garage})
+
+def garage_detail(request, garage_id):
+    garage = get_object_or_404(Garage, id=garage_id)
+    return render(request, "garage/garage_detail.html", {"garage": garage})
+
+@login_required
+def create_garage(request):
+    if request.method == "POST":
+        form = GarageForm(request.POST, request.FILES)
+        if form.is_valid():
+            garage = form.save(commit=False)
+            garage.owner = request.user  # ← to jest kluczowe
+            garage.save()
+            form.save_m2m()
+            messages.success(request, "Garage created successfully.")
+            return redirect("garage:owner_dashboard")
+    else:
+        form = GarageForm()
+    return render(request, "garage/edit_garage.html", {"form": form, "garage": None})

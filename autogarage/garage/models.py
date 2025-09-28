@@ -2,16 +2,26 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from users.models import User
+import os
+from django.db.models.signals import pre_save, post_delete
+from django.dispatch import receiver
 
-class GarageFeature(models.Model):
-    name = models.CharField(max_length=100)
-    icon = models.CharField(max_length=50, blank=True, null=True)  # np. "fa-wrench"
+class GarageAllowedActivity(models.Model):
+    name = models.CharField(max_length=120)
+    icon = models.CharField(max_length=50, blank=True, null=True)  # np. "fa-tools"
 
     def __str__(self):
         return self.name
     
-class GarageActivity(models.Model):
-    name = models.CharField(max_length=100)
+class GarageForbiddenActivity(models.Model):
+    name = models.CharField(max_length=120)
+    icon = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+    
+class GarageTool(models.Model):
+    name = models.CharField(max_length=120)
     icon = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
@@ -22,12 +32,13 @@ class Garage(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price_per_hour = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-    location = models.CharField(max_length=200)
+    location = models.CharField(max_length=200, blank=True)
+    image = models.ImageField(upload_to="garages/", blank=True, null=True) # główne zdjęcie garażu
     is_available = models.BooleanField(default=True)
 
-    features = models.ManyToManyField(GarageFeature, blank=True, related_name="garages")
-    activities = models.ManyToManyField(GarageActivity, blank=True, related_name="garages")
-    image = models.ImageField(upload_to="garages/", blank=True, null=True)  # główne zdjęcie
+    allowed_activities = models.ManyToManyField(GarageAllowedActivity, blank=True, related_name="garages")
+    forbidden_activities = models.ManyToManyField(GarageForbiddenActivity, blank=True, related_name="garages")
+    tools = models.ManyToManyField(GarageTool, blank=True, related_name="garages")
 
     def __str__(self):
         return self.name
@@ -82,4 +93,28 @@ class Camera(models.Model):
 
     def is_http(self):
         return self.stream_url and self.stream_url.startswith("http")
-    
+
+
+
+
+@receiver(pre_save, sender=Garage)
+def delete_old_image_on_update(sender, instance, **kwargs):
+    if not instance.pk:
+        return  # New object, no old image to delete
+
+    try:
+        old_image = Garage.objects.get(pk=instance.pk).image
+    except Garage.DoesNotExist:
+        return
+
+    new_image = instance.image
+    if old_image and old_image != new_image:
+        if os.path.isfile(old_image.path):
+            os.remove(old_image.path)
+
+
+@receiver(post_delete, sender=Garage)
+def delete_image_on_delete(sender, instance, **kwargs):
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)

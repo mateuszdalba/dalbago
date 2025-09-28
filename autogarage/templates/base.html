@@ -3,10 +3,25 @@
 <html lang="pl">
 <head>
   <meta charset="utf-8">
-  <title>DalbaGo</title>
+  <title>{% block title %}DalbaGo{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <meta name="description" content="DalbaGo - Find, book, and manage self-service garages easily.">
+  <meta name="author" content="DalbaGo Team">
+
+  <!-- Open Graph (for Facebook / LinkedIn sharing) -->
+  <meta property="og:title" content="DalbaGo - Book Self-Service Garages">
+  <meta property="og:description" content="Find and rent garages for your DIY car maintenance.">
+  <meta property="og:image" content="{% static 'images/og-image.jpg' %}">
+  <meta property="og:url" content="https://dalbago.pl/">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Favicon -->
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+
+
 </head>
 <body class="flex flex-col min-h-screen bg-gray-50 text-gray-900 font-sans">
 
@@ -34,6 +49,20 @@
 
   <!-- Footer -->
   {% include "partials/_footer.html" %}
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "DalbaGo",
+  "url": "https://dalbago.pl",
+  "description": "Book self-service garages for car repairs or detailing.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "PL"
+  }
+}
+</script>
 
 </body>
 </html>
